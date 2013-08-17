@@ -130,6 +130,13 @@ article p:empty:after {
   color: #888;
 }
 
+article blockquote {
+  background-color: #fff;
+  border-left: 8px solid #ddd;
+  margin: 0;
+  padding: 12px;
+}
+
 article img {
   display: block;
   margin: auto;
