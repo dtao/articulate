@@ -231,6 +231,18 @@
         changeCurrentElementTo('H3');
       }],
 
+      'ctrl+4': ['changes the current element to a <h4>', function() {
+        changeCurrentElementTo('H4');
+      }],
+
+      'ctrl+5': ['changes the current element to a <h5>', function() {
+        changeCurrentElementTo('H5');
+      }],
+
+      'ctrl+6': ['changes the current element to a <h6>', function() {
+        changeCurrentElementTo('H6');
+      }],
+
       'ctrl+p': ['changes the current element to a paragraph (<p>)', function() {
         changeCurrentElementTo('P');
       }],
