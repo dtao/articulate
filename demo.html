@@ -5,7 +5,6 @@
     <title>Articulate</title>
     <link rel="stylesheet" type="text/css" href="lib/codemirror.css" />
     <link rel="stylesheet" type="text/css" href="demo.css" />
-    <!-- <link rel="stylesheet" type="text/css" href="articulate.css" /> -->
     <script src="lib/mousetrap.js"></script>
     <script src="lib/codemirror.js"></script>
     <script src="lib/mode/clike.js"></script>
@@ -21,9 +20,7 @@
         window.addEventListener('load', function() {
             var article = document.querySelector('article');
 
-            Articulate(article, {
-                toc: document.querySelector('nav')
-            });
+            Articulate(article);
         });
     </script>
 </head>
