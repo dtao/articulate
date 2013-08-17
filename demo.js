@@ -94,52 +94,6 @@ function changeCurrentElementToEditor(mode) {
   changeElementToEditor(getCurrentElement(), mode);
 }
 
-function changeSelectionTo(element, range, name, attributes) {
-  if (!element) {
-    return;
-  }
-
-  var container = getContainerElement(element);
-  var html = container.innerHTML;
-
-  var newElement = createElement(name, attributes);
-  newElement.innerHTML = html.substring(range[0], range[1]);
-
-  container.innerHTML = html.substring(0, range[0]) +
-    newElement.outerHTML + html.substring(range[1]);
-
-  dirty();
-}
-
-function changeCurrentSelectionTo(name, attributes) {
-  var selection = window.getSelection();
-  changeSelectionTo(selection.anchorNode, getRange(selection), name, attributes);
-}
-
-function getRange(selection) {
-  var range = getMinMax(selection.anchorOffset, selection.focusOffset);
-
-  // Expand range as necessary in case what's selected includes HTML entities.
-  var length = escapeHTML(selection.anchorNode.textContent.substring(range[0], range[1])).length;
-  range[1] = range[0] + length;
-
-  // Adjust offsets based on where the current selection is within the parent.
-  var offset = getTotalOffset(selection.anchorNode);
-  range[0] += offset;
-  range[1] += offset;
-
-  return range;
-}
-
-function getTotalOffset(element) {
-  var offset = 0;
-  while (element && element.previousSibling) {
-    element = element.previousSibling;
-    offset += (element.outerHTML || escapeHTML(element.textContent)).length;
-  }
-  return offset;
-}
-
 function isHeading(name) {
   return !!name.match(/^h\d$/i);
 }
@@ -264,25 +218,6 @@ function notify(message, className, attributes) {
 }
 
 // ----- Utils -----
-
-function getMinMax(x, y) {
-  return x < y ? [x, y] : [y, x];
-}
-
-function escapeHTML(html) {
-  // Here's the StackOverflow implementation:
-  // http://stackoverflow.com/questions/5251520/how-do-i-escape-some-html-in-javascript
-
-  // var pre = createElement('pre');
-  // var text = document.createTextNode(html);
-  // pre.appendChild(text);
-  // return pre.innerHTML;
-
-  // I'm going to go with something more lightweight (?), though.
-  return html.replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-}
 
 function arrayContains(array, element) {
   for (var i = 0; i < array.length; ++i) {
@@ -698,54 +633,11 @@ window.addEventListener('load', function() {
       insertNewElement(currentElement.nodeName, currentElement.previousSibling);
     }],
 
-    'enter': ['creates a new element', function(e) {
-      if (isInCodeEditor(e) || isModalShowing()) {
-        return;
-      }
-
-      if (!e.shiftKey) {
-        insertNewElement(getCurrentElement().nodeName);
-      }
-    }],
-
-    'backspace': ['deletes the current element (if empty)', function(e) {
-      if (isInCodeEditor(e)) {
-        return;
-      }
-
-      if (getCurrentElement().textContent === '') {
-        removeCurrentElement();
-        return;
-      }
-
-      e.keepDefault = true;
-    }],
-
     'ctrl+m': ['creates a code editor from the current element', function() {
       var currentElement = getCurrentElement();
       getListSelection('Select a language mode', getAvailableModes(), function(mode) {
         changeElementToEditor(currentElement, mode);
       });
-    }],
-
-    'ctrl+i': ['makes the selected text italic', function() {
-      changeCurrentSelectionTo('EM');
-    }],
-
-    'ctrl+b': ['makes the selected text bold', function() {
-      changeCurrentSelectionTo('STRONG');
-    }],
-
-    'ctrl+`': ['marks the selected text as source code (<code>)', function() {
-      changeCurrentSelectionTo('CODE');
-    }],
-
-    'ctrl+k': ['marks the selected text as a keyboard key (<kbd>)', function() {
-      changeCurrentSelectionTo('KBD');
-    }],
-
-    'ctrl+backspace': ['marks the selected text as deleted', function() {
-      changeCurrentSelectionTo('DEL');
     }],
 
     'ctrl+a': ['add a hyperlink (<a>)', function(e) {
@@ -767,65 +659,6 @@ window.addEventListener('load', function() {
 
       getInput('Enter the URL of an image', function(src) {
         changeElementTo(element, 'IMG', { src: src });
-      });
-    }],
-
-    'esc': [true, null, function() {
-      var autohideElements = document.querySelectorAll('.autohide.visible');
-      if (autohideElements.length > 0) {
-        for (var i = 0; i < autohideElements.length; ++i) {
-          hideElement(autohideElements[i]);
-        }
-        return;
-      }
-
-      if (!isEditing()) {
-        return;
-      }
-
-      var currentElement = getCurrentElement();
-      if (currentElement) {
-        currentElement.blur();
-
-        if (isEmpty(currentElement.textContent)) {
-          removeElement(currentElement);
-        }
-      }
-    }],
-
-    'ctrl+=': [true, 'increases the width of the article', function() {
-      expandArticle();
-    }],
-
-    'ctrl+-': [true, 'decreases the width of the article', function() {
-      contractArticle();
-    }],
-
-    'ctrl+t': [true, 'switches the current theme', function() {
-      switchTheme();
-    }],
-
-    'ctrl+n': [true, 'starts a new article', function() {
-      startNewArticle();
-    }],
-
-    'ctrl+o': [true, 'opens a saved article', function() {
-      openArticle();
-    }],
-
-    'ctrl+s': [true, 'saves the article locally', function() {
-      save();
-    }],
-
-    'ctrl+shift+s': [true, 'saves a copy of the current article', function() {
-      getInput('Enter a new name for the article', function(input) {
-        if (isEmpty(input)) {
-          notify('Name is required!', 'error');
-          return;
-        }
-
-        articleName = input;
-        save();
       });
     }]
   });

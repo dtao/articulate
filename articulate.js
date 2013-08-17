@@ -59,6 +59,26 @@
     return changeElementTo(getCurrentElement(), name, attributes);
   }
 
+  function changeSelectionTo(element, range, name, attributes) {
+    if (!element) {
+      return;
+    }
+
+    var container = getContainerElement(element);
+    var html = container.innerHTML;
+
+    var newElement = createElement(name, attributes);
+    newElement.innerHTML = html.substring(range[0], range[1]);
+
+    container.innerHTML = html.substring(0, range[0]) +
+      newElement.outerHTML + html.substring(range[1]);
+  }
+
+  function changeCurrentSelectionTo(name, attributes) {
+    var selection = window.getSelection();
+    changeSelectionTo(selection.anchorNode, getRange(selection), name, attributes);
+  }
+
   function removeElement(element) {
     var name = element.nodeName;
     var previousElement = getPreviousElement(element);
@@ -113,6 +133,44 @@
   // I just hate how delay is the second argument to setTimeout.
   function doAfterDelay(delay, callback) {
     return setTimeout(callback, delay);
+  }
+
+  function getRange(selection) {
+    var range = getMinMax(selection.anchorOffset, selection.focusOffset);
+
+    // Expand range as necessary in case what's selected includes HTML entities.
+    var length = escapeHTML(selection.anchorNode.textContent.substring(range[0], range[1])).length;
+    range[1] = range[0] + length;
+
+    // Adjust offsets based on where the current selection is within the parent.
+    var offset = getTotalOffset(selection.anchorNode);
+    range[0] += offset;
+    range[1] += offset;
+
+    return range;
+  }
+
+  function getTotalOffset(element) {
+    var offset = 0;
+    while (element && element.previousSibling) {
+      element = element.previousSibling;
+      offset += (element.outerHTML || escapeHTML(element.textContent)).length;
+    }
+    return offset;
+  }
+
+  function getMinMax(x, y) {
+    return x < y ? [x, y] : [y, x];
+  }
+
+  function escapeHTML(html) {
+    // Taken from StackOverflow question:
+    // http://stackoverflow.com/questions/5251520/how-do-i-escape-some-html-in-javascript
+
+    var pre = createElement('pre');
+    var text = document.createTextNode(html);
+    pre.appendChild(text);
+    return pre.innerHTML;
   }
 
   function createBindings(element, dictionary) {
@@ -184,6 +242,26 @@
       'ctrl+q': ['changes the current element to a quote (<blockquote>)', function() {
         changeCurrentElementTo('BLOCKQUOTE');
       }],
+
+      'ctrl+i': ['makes the selected text italic', function() {
+        changeCurrentSelectionTo('EM');
+      }],
+
+      'ctrl+b': ['makes the selected text bold', function() {
+        changeCurrentSelectionTo('STRONG');
+      }],
+
+      'ctrl+`': ['marks the selected text as source code (<code>)', function() {
+        changeCurrentSelectionTo('CODE');
+      }],
+
+      'ctrl+k': ['marks the selected text as a keyboard key (<kbd>)', function() {
+        changeCurrentSelectionTo('KBD');
+      }],
+
+      'ctrl+backspace': ['marks the selected text as deleted', function() {
+        changeCurrentSelectionTo('DEL');
+      }]
     });
   }
 
