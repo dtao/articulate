@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Articulate</title>
+    <link rel="stylesheet" type="text/css" href="lib/codemirror.css" />
+    <link rel="stylesheet" type="text/css" href="demo.css" />
+    <!-- <link rel="stylesheet" type="text/css" href="articulate.css" /> -->
+    <script src="lib/mousetrap.js"></script>
+    <script src="lib/codemirror.js"></script>
+    <script src="lib/mode/clike.js"></script>
+    <script src="lib/mode/coffeescript.js"></script>
+    <script src="lib/mode/javascript.js"></script>
+    <script src="lib/mode/python.js"></script>
+    <script src="lib/mode/ruby.js"></script>
+    <script src="lib/lazy.js"></script>
+    <script src="lib/lazy.dom.js"></script>
+    <script src="articulate.js"></script>
+
+    <script>
+        window.addEventListener('load', function() {
+            var article = document.querySelector('article');
+
+            Articulate(article, {
+                toc: document.querySelector('nav')
+            });
+        });
+    </script>
+</head>
+
+<body class="default">
+    <nav>
+        <ul></ul>
+    </nav>
+
+    <aside id="notices">
+        <ul></ul>
+    </aside>
+
+    <article>
+        <h1>Articulate</h1>
+
+        <h2>A nice little editor</h2>
+    </article>
+
+    <div id="modal-input" class="autohide">
+        <input type="text" />
+    </div>
+
+    <div id="modal-blob" class="autohide">
+        <textarea></textarea>
+    </div>
+
+    <div id="modal-list" class="autohide">
+        <h1></h1>
+        <ul></ul>
+    </div>
+
+    <aside id="shortcuts">
+        <table></table>
+    </aside>
+
+    <aside id="selection">
+        <span id="anchor-offset"></span>
+        <span id="focus-offset"></span>
+        <span id="total-offset"></span>
+    </aside>
+</body>
+
+</html>
