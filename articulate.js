@@ -122,6 +122,14 @@
     element.setAttribute('contenteditable', true);
   }
 
+  function getNodeNameForNewElement(name) {
+    if ((/^H\d$/).test(name)) {
+      return 'P';
+    }
+
+    return name;
+  }
+
   function focus(element) {
     if (!element) {
       return;
@@ -200,7 +208,7 @@
 
     createBindings(element, {
       'enter': ['creates a new element', function() {
-        insertNewElement(getCurrentElement().nodeName);
+        insertNewElement(getNodeNameForNewElement(getCurrentElement().nodeName));
       }],
 
       'backspace': ['deletes the current element (if empty)', function(e) {
